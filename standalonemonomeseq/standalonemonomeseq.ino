@@ -48,6 +48,7 @@ byte loop_start, loop_end = 15;
 unsigned long t = millis();
 unsigned long interval = 200;
 
+int currentMode = 0;  //default 0 = steps, 1 = polygome (needed for draw/update/keys/...)
 
 // SETUP //////////////////
 
@@ -91,7 +92,10 @@ void ConnectCallback(const char * name, byte cols, byte rows) {
 
 
 void GridKeyCallback(byte x, byte y, byte z) {
-  stepsKey(x,y,z);
+  if (currentMode == 0)
+    stepsKey(x,y,z);
+  else if (currentMode == 1)
+    polygomeKey(x,y,z,play_position);
 }
 
 
@@ -179,7 +183,10 @@ void loop()
   
   // redraw if dirty
   if(dirty) {
-    redraw();
+    if (currentMode == 0)
+      stepsRedraw();
+    if (currentMode == 1)
+      polygomeRedraw();  
     monome.refresh();
     dirty = false;
   }
@@ -188,40 +195,11 @@ void loop()
   
 }
 
-  
 
-
-// REDRAW ////////////////// 
-void redraw() {
-  monome.led_clear();
-  
-  // draw toggles with play bar
-  byte highlight;
-  for(byte x=0;x<16;x++) {
-    if(x == play_position)
-      highlight = 4;
-    else
-      highlight = 0;
-      
-    for(byte y=0;y<6;y++)
-      monome.led_set(x,y,step[y][x] * 11 + highlight);
-  }
-  
-  // draw trigger row and on-triggers
-  for(byte x=0;x<16;x++)
-    monome.led_set(x,6,4);
-  for(byte y=0;y<6;y++)
-    if(step[y][play_position] == 1)
-      monome.led_set(y,6,15);
-      
-  // draw playback position
-  monome.led_set(play_position,7,15);
-}
 
 // NEXT ////////////////// 
 void next() {
   killNotes();
-
   if(cutting)
     play_position = next_position;
   else if(play_position == 15)
@@ -234,30 +212,16 @@ void next() {
   cutting = false;
     
   
-  // TRIGGER SOMETHING
+  // TRIGGER SOMETHING for STEPS
   for(byte y=0;y<6;y++)
     if(step[y][play_position] == 1)
-      trigger(y);
+      stepsTrigger(y);
+
+  //TRIGGER for polygome
+    polygomeTrigger();
   
   dirty = true;
 }
-
-// TRIGGER ////////////////// 
-void trigger(byte i) {
-   MIDI.sendNoteOn(i, 127, 1);
-//   Serial.print(i);
-   notes[1][i] = 1;  ///set notes playing on channel/note
-
-}
+  
 
 
-void killNotes(){
-    for(byte ch=0;ch<16;ch++){
-      for(byte nt=0;nt<127;nt++){
-        if(notes[ch][nt] == 1){
-          MIDI.sendNoteOn(nt, 0, ch);
-          notes[ch][nt] = 0;
-        }
-      }
-    }
-  }

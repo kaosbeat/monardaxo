@@ -32,7 +32,8 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
 //      Serial.print(" changed to ");
 //      Serial.println(old_p->button[idx]);
       if (old_p->button[idx] == true){
-        MIDI.sendNoteOn(idx, 127, 2);
+//        MIDI.sendNoteOn(idx, 127, 2);
+        currentMode = idx;
         }
       else if (old_p->button[idx] == false){
         MIDI.sendNoteOn(idx, 0, 2);
