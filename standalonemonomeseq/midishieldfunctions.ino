@@ -64,3 +64,76 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
 //  digitalWrite(PIN_LED_GRN, !data->button[0]);
 //  digitalWrite(PIN_LED_RED, !data->button[1]);
 //}
+
+
+void getMidiData(){
+    //read midishieldbuttondata
+  readinputs(& newdata);
+  compareinputs(& lastdata, & newdata);
+//  updateLEDs(&newdata);
+  static uint32_t loops = 0;  
+  static uint8_t  ticks = 0;
+  static uint8_t  prev_ticks = 0;
+  if(  MIDI.read())
+  {
+    switch(MIDI.getType())
+    {
+      case midi::Clock :
+      { 
+        ticks++;
+
+        //Serial.print('.');
+//        Serial.println(ticks);        
+        
+        if(ticks < 6)
+        {
+          digitalWrite(PIN_LED_TEMPO, LOW);
+          //Serial.print('#');       
+        }
+        else if(ticks == 6)
+        {
+          digitalWrite(PIN_LED_TEMPO, HIGH);
+          next();
+        }
+        else if(ticks >= 24)
+        {
+          ticks = 0;
+//          Serial.print('\n');
+        }
+      }
+      break;
+      
+      case midi::Start :
+      {
+        digitalWrite(PIN_LED_PLAYING, LOW);
+        ticks = 0;
+//        Serial.println("Starting");
+      }
+      break;
+
+      case midi::Stop :
+      {
+        digitalWrite(PIN_LED_PLAYING, HIGH);
+        prev_ticks = ticks;
+//        Serial.println("Stopping");
+      }
+      break;
+      case midi::Continue :
+      {
+
+        digitalWrite(PIN_LED_PLAYING, LOW);
+
+        // Restore the LED blink counter
+        ticks = prev_ticks;
+//        Serial.println("continuing");
+      }
+      break;
+      
+      default:
+      break;
+    }
+  }
+
+  loops++;
+}
+
