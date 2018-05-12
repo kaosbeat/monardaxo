@@ -23,16 +23,15 @@ byte heldkeys[16][8];
 
 void polygomeKey(byte x,byte y,byte z, int play_position){  
   if(z == 1 && y > 0) {
-    heldkeys[x][y] = 1;
-    seq1offset = (y * 16) + x;
-    seq1startstep = play_position;
+    heldkeys[x][y] = 1+play_position;
+//    seq1offset = (y * 16) + x;
     seq1play = true;
 //    monome.led_set(x,y,15);
     dirty = true; 
   }
   else if (z == 0 &&  y > 0) {
     heldkeys[x][y] = 0;
-    seq1offset = (y * 16) + x;
+//    seq1offset = (y * 16) + x;
     seq1play = false;
 //    monome.led_set(x,y,0);
     dirty = true; 
@@ -47,8 +46,12 @@ void polygomeRedraw() {
   //draw current held keys
   for(byte x=0;x<16;x++){
       for(byte y=0;y<8;y++){
-        if(heldkeys[x][y] == 1){
+        if(heldkeys[x][y] > 0){
           monome.led_set(x,y,15);
+          for (int i=0; i<play_position-heldkeys[x][y]; i++){
+            monome.led_set(noteNumberToGridX(seq1[i]+gridXYtoNotenumer(x,y)),noteNumberToGridY(seq1[i]+gridXYtoNotenumer(x,y)),15);
+            
+          }
         }
       }
   }
@@ -61,4 +64,22 @@ void polygomeRedraw() {
 
 void polygomeTrigger() {
 //  seq1currentstep = play_position - seq1startstep; ///potentially crashing if < than 0
+
   }
+
+byte gridXYtoNotenumer(byte x, byte y) {
+  byte note = y*16 + x;
+  return note;
+}
+
+byte noteNumberToGridX(byte note) {
+  byte x = note % 16;
+  return x;
+}
+
+byte noteNumberToGridY(byte note) {
+  byte x = note % 16;
+  byte y = (note - x) / 16 ;
+  return y;
+}
+
