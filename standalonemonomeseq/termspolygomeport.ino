@@ -1,7 +1,9 @@
-int seq1[10]={9,3,2,4,3,2,7,8,9,11}; ///sequence of offsets
+const int seq1size = 10;
+float seq1[seq1size]={8,16,12,0,15,5,12,8,-16,20}; ///sequence of offsets
 bool seq1play = false;
-int seq1startstep = 0;
-int seq1currentstep = 0;
+int seq1from = 0;
+int seq1till = 0;
+int seq1step = 0;
 int seq1offset = 0;
 byte heldkeys[16][8];
 //byte seq1pos[
@@ -43,15 +45,49 @@ void polygomeRedraw() {
   monome.led_clear();
 //  byte x = seq1offset % 16;
 //  byte y = seq1offset - (16 * x) ;
-  //draw current held keys
+  //from current step draw with overflow currently held keys
+  
+  //draw current held keys, unfrozen state
+
+//  currentseqstep = play_position (heldkeys[x][y] - 1 + seq1.size())
   for(byte x=0;x<16;x++){
       for(byte y=0;y<8;y++){
         if(heldkeys[x][y] > 0){
-          monome.led_set(x,y,15);
-          for (int i=0; i<play_position-heldkeys[x][y]; i++){
-            monome.led_set(noteNumberToGridX(seq1[i]+gridXYtoNotenumer(x,y)),noteNumberToGridY(seq1[i]+gridXYtoNotenumer(x,y)),15);
-            
-          }
+          //vars needed
+          //play_position 
+          seq1from = heldkeys[x][y] - 1;
+          seq1till = (seq1from + seq1size)%16;
+          if ((play_position >= seq1from && play_position < seq1till) && (seq1from < seq1till)) ///case without overflow
+            {
+             monome.led_set(x,y,15);
+             seq1step = play_position - seq1from;
+             for (int i=0; i< seq1step; i++){
+                byte note = seq1[i]+gridXYtoNoteNumber(x,y);
+                monome.led_set(noteNumberToGridX(note),noteNumberToGridY(note),15);
+                if (i == seq1step-1){
+                  MIDI.sendNoteOn(note, 127, 2);
+                  notes[2][note] = 1;  /// set on channel two for polygome
+                }
+             }
+            }
+          else if ((play_position >= seq1from || play_position < seq1till) && (seq1from > seq1till)) ///case with overflow
+            {
+             monome.led_set(x,y,15);
+             if (play_position >= seq1from) {
+              seq1step = play_position - seq1from;
+             }
+             if (play_position < seq1till) {
+              seq1step = 16 - seq1from + play_position;
+             }
+             for (int i=0; i< seq1step; i++){
+                byte note = seq1[i]+gridXYtoNoteNumber(x,y);
+                monome.led_set(noteNumberToGridX(note),noteNumberToGridY(note),15);
+                if (i == seq1step-1){
+                  MIDI.sendNoteOn(note, 127, 2);
+                  notes[2][note] = 1;  /// set on channel two for polygome
+                }
+             }
+            }
         }
       }
   }
@@ -67,7 +103,7 @@ void polygomeTrigger() {
 
   }
 
-byte gridXYtoNotenumer(byte x, byte y) {
+byte gridXYtoNoteNumber(byte x, byte y) {
   byte note = y*16 + x;
   return note;
 }
