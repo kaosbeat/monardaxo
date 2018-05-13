@@ -26,10 +26,16 @@ byte heldkeys[16][8];
 
 void polygomeKey(byte x,byte y,byte z, int play_position){  
   if(z == 1 && x==0 && y==0) {
-    freezekeys = true;
+    if (freezekeys == false) {
+      freezekeys = true;
+      monome.led_set(0,0,15);
+    } else {
+      freezekeys = false;
+      monome.led_set(0,0,0);
+    }
+    
   }
-
-  if (freezekeys == false) { ////stop updating shizzle
+  if (freezekeys == false) { ////start updating shizzle
     if(z == 1 && y > 0) {
       heldkeys[x][y] = 1+play_position;
       seq1play = true;
