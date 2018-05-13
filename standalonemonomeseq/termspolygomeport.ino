@@ -1,6 +1,7 @@
 const int seq1size = 10;
 float seq1[seq1size]={8,16,12,0,15,5,12,8,-16,20}; ///sequence of offsets
 bool seq1play = false;
+bool freezekeys = false;
 int seq1from = 0;
 int seq1till = 0;
 int seq1step = 0;
@@ -24,19 +25,21 @@ byte heldkeys[16][8];
 //void polygomeInit(){}
 
 void polygomeKey(byte x,byte y,byte z, int play_position){  
-  if(z == 1 && y > 0) {
-    heldkeys[x][y] = 1+play_position;
-//    seq1offset = (y * 16) + x;
-    seq1play = true;
-//    monome.led_set(x,y,15);
-    dirty = true; 
+  if(z == 1 && x==0 && y==0) {
+    freezekeys = true;
   }
-  else if (z == 0 &&  y > 0) {
-    heldkeys[x][y] = 0;
-//    seq1offset = (y * 16) + x;
-    seq1play = false;
-//    monome.led_set(x,y,0);
-    dirty = true; 
+
+  if (freezekeys == false) { ////stop updating shizzle
+    if(z == 1 && y > 0) {
+      heldkeys[x][y] = 1+play_position;
+      seq1play = true;
+      dirty = true; 
+    }
+    else if (z == 0 &&  y > 0) {
+      heldkeys[x][y] = 0;
+      seq1play = false;
+      dirty = true; 
+    }
   }
  }
 
