@@ -1,6 +1,6 @@
 # monardaxo
 monome - arduino - axoloti > standalone setup
-
+![look ma, no computer](https://github.com/kaosbeat/monardaxo/raw/master/IMG_20180520_175604-ANIMATION.gif "blinking lights")
 
 ## features
 - external clokc sync
