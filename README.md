@@ -39,7 +39,7 @@ Now Just sending it to ableton will not solve a whole lot of problems, so to fin
 - simple sequencer from gridstudies (copy paste https://monome.org/docs/grid-studies/arduino/)
 - external midi clock sets speed for sequencer!
 - simple axo test patch (contains clock and monophonic sine synth)
-
+- [video demo](https://photos.app.goo.gl/46T9G2FQWuUtTKzF3)
 
 
 
