@@ -44,6 +44,7 @@ byte keys_held, key_last;
 byte loop_start, loop_end = 15;
 byte step[6][16];
 byte notes[16][127]; /// notesplaying 16 channels / 127 notes
+int polygome_channel = 1;
 int notes_channel = 16; //midi channel for notes app
 
 unsigned long t = millis();

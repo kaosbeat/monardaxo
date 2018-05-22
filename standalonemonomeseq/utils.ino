@@ -12,18 +12,3 @@ void killNotes(){
   }
 
 
-byte gridXYtoNoteNumber(byte x, byte y) {
-  byte note = y*16 + x;
-  return note;
-}
-
-byte noteNumberToGridX(byte note) {
-  byte x = note % 16;
-  return x;
-}
-
-byte noteNumberToGridY(byte note) {
-  byte x = note % 16;
-  byte y = (note - x) / 16 ;
-  return y;
-}

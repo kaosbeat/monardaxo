@@ -78,8 +78,8 @@ void polygomeRedraw() {
                 byte note = seq1[i]+gridXYtoNoteNumber(x,y);
                 monome.led_set(noteNumberToGridX(note),noteNumberToGridY(note),15);
                 if (i == seq1step-1){
-                  MIDI.sendNoteOn(note, 127, 1);
-                  notes[2][note] = 1;  /// set on channel two for polygome
+                  MIDI.sendNoteOn(note, 127, polygome_channel);
+                  notes[polygome_channel][note] = 1;  /// set on polygomechannel
                 }
              }
             }
@@ -96,8 +96,8 @@ void polygomeRedraw() {
                 byte note = seq1[i]+gridXYtoNoteNumber(x,y);
                 monome.led_set(noteNumberToGridX(note),noteNumberToGridY(note),15);
                 if (i == seq1step-1){
-                  MIDI.sendNoteOn(note, 127, 1);
-                  notes[2][note] = 1;  /// set on channel two for polygome
+                  MIDI.sendNoteOn(note, 127, polygome_channel);
+                  notes[polygome_channel][note] = 1;  /// set on polygomechannel
                 }
              }
             }
@@ -115,4 +115,21 @@ void polygomeTrigger() {
 //  seq1currentstep = play_position - seq1startstep; ///potentially crashing if < than 0
 
   }
+
+
+byte gridXYtoNoteNumber(byte x, byte y) {
+  byte note = y*16 + x;
+  return note;
+}
+
+byte noteNumberToGridX(byte note) {
+  byte x = note % 16;
+  return x;
+}
+
+byte noteNumberToGridY(byte note) {
+  byte x = note % 16;
+  byte y = (note - x) / 16 ;
+  return y;
+}
 
