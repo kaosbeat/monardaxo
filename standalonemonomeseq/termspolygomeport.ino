@@ -1,5 +1,7 @@
-const int seq1size = 10;
-float seq1[seq1size]={8,16,12,0,15,5,12,8,-16,20}; ///sequence of offsets
+int polypage = 0;
+const int seq1size = 16;
+float seq1[seq1size]={8,16,12,0,15,5,12,8,-16,20};///, 127,127,127,127,127,127}; ///sequence of offsets /// if 127 > skip note
+int notelength[seq1size] = {1,1,1,2,1,1,1,2,1,4};///, 1,2,3,4,5,6}; ///notelength 1=1/16, 2=1/8, 3=1/4, 4=1/2, 5=1/1, 6=2/1, 7=4/1 
 bool seq1play = false;
 bool freezekeys = false;
 int seq1from = 0;
@@ -29,9 +31,11 @@ void polygomeKey(byte x,byte y,byte z, int play_position){
     if (freezekeys == false) {
       freezekeys = true;
       monome.led_set(0,0,15);
+      dirty = true; 
     } else {
       freezekeys = false;
       monome.led_set(0,0,0);
+      dirty = true; 
     }
     
   }
@@ -74,7 +78,7 @@ void polygomeRedraw() {
                 byte note = seq1[i]+gridXYtoNoteNumber(x,y);
                 monome.led_set(noteNumberToGridX(note),noteNumberToGridY(note),15);
                 if (i == seq1step-1){
-                  MIDI.sendNoteOn(note, 127, 2);
+                  MIDI.sendNoteOn(note, 127, 1);
                   notes[2][note] = 1;  /// set on channel two for polygome
                 }
              }
@@ -92,7 +96,7 @@ void polygomeRedraw() {
                 byte note = seq1[i]+gridXYtoNoteNumber(x,y);
                 monome.led_set(noteNumberToGridX(note),noteNumberToGridY(note),15);
                 if (i == seq1step-1){
-                  MIDI.sendNoteOn(note, 127, 2);
+                  MIDI.sendNoteOn(note, 127, 1);
                   notes[2][note] = 1;  /// set on channel two for polygome
                 }
              }
@@ -111,20 +115,4 @@ void polygomeTrigger() {
 //  seq1currentstep = play_position - seq1startstep; ///potentially crashing if < than 0
 
   }
-
-byte gridXYtoNoteNumber(byte x, byte y) {
-  byte note = y*16 + x;
-  return note;
-}
-
-byte noteNumberToGridX(byte note) {
-  byte x = note % 16;
-  return x;
-}
-
-byte noteNumberToGridY(byte note) {
-  byte x = note % 16;
-  byte y = (note - x) / 16 ;
-  return y;
-}
 

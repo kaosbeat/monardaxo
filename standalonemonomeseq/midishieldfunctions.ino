@@ -27,13 +27,9 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
     if(old_p->button[idx] != new_p->button[idx])
     {
       old_p->button[idx] = new_p->button[idx];
-//      Serial.print("Button #");
-//      Serial.print(idx);
-//      Serial.print(" changed to ");
-//      Serial.println(old_p->button[idx]);
       if (old_p->button[idx] == true){
-//        MIDI.sendNoteOn(idx, 127, 2);
         currentMode = idx;
+        MIDI.sendNoteOn(idx, 127, 2);
         }
       else if (old_p->button[idx] == false){
         MIDI.sendNoteOn(idx, 0, 2);
@@ -126,6 +122,22 @@ void getMidiData(){
         // Restore the LED blink counter
         ticks = prev_ticks;
 //        Serial.println("continuing");
+      }
+      break;
+      case midi::NoteOn :
+      {
+        if (MIDI.getChannel() == notes_channel) {
+           midiLed(MIDI.getData1(), MIDI.getData2());
+        }
+            
+      }
+      break;
+      case midi::NoteOff :
+      {
+        if (MIDI.getChannel() == notes_channel) {
+           midiLed(MIDI.getData1(), 0);
+        }
+            
       }
       break;
       

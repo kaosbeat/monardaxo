@@ -1,3 +1,5 @@
+
+
 void stepsKey(byte x,byte y,byte z){  
   // toggle steps
   if(z == 1 && y < 6) {
@@ -63,17 +65,6 @@ void stepsTrigger(byte i) {
 
 
 
-/////util for this program
 
-void killNotes(){
-    for(byte ch=0;ch<16;ch++){
-      for(byte nt=0;nt<127;nt++){
-        if(notes[ch][nt] == 1){
-          MIDI.sendNoteOn(nt, 0, ch);
-          notes[ch][nt] = 0;
-        }
-      }
-    }
-  }
 
 

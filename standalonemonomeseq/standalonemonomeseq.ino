@@ -35,8 +35,6 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 USBHost usb;
 MonomeController monome(usb);
 
-byte step[6][16];
-byte notes[16][127]; /// notesplaying 16 channels / 127 notes
 
 boolean dirty;
 byte play_position;
@@ -44,6 +42,9 @@ byte next_position;
 boolean cutting;
 byte keys_held, key_last;
 byte loop_start, loop_end = 15;
+byte step[6][16];
+byte notes[16][127]; /// notesplaying 16 channels / 127 notes
+int notes_channel = 16; //midi channel for notes app
 
 unsigned long t = millis();
 unsigned long interval = 200;
@@ -96,6 +97,8 @@ void GridKeyCallback(byte x, byte y, byte z) {
     stepsKey(x,y,z);
   else if (currentMode == 1)
     polygomeKey(x,y,z,play_position);
+  else if (currentMode == 2)
+    notesKey(x,y,z);
 }
 
 
@@ -103,7 +106,7 @@ void GridKeyCallback(byte x, byte y, byte z) {
 
 void loop() 
 {
-getMidiData();  
+getMidiData();   //// all incoming midi processing is done in midishielfunctions
 
   ///monomestuff
   usb.Task();
@@ -115,6 +118,8 @@ getMidiData();
       stepsRedraw();
     if (currentMode == 1)
       polygomeRedraw();  
+    if (currentMode == 2)
+      notesRedraw();  
     monome.refresh();
     dirty = false;
   }
