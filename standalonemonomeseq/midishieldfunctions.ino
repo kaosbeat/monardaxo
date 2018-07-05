@@ -21,7 +21,7 @@ void readinputs(struct inputStates * data)
 void compareinputs(inputStates * old_p, inputStates * new_p)
 {
   uint8_t idx;
-  
+//  steps_notesoffset = old_p->pot[1];
   for(idx = 0; idx < 3; idx++)
   {
     if(old_p->button[idx] != new_p->button[idx])
@@ -47,8 +47,9 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
 //      Serial.print(idx);
 //      Serial.print(" changed to ");
 //      Serial.println(old_p->pot[idx]);
-        MIDI.sendControlChange(idx, old_p->pot[idx],2);
-      
+//      MIDI.sendControlChange(idx, old_p->pot[idx],2);
+      if (idx == 0) { steps_notesoffset = (old_p->pot[idx]); }
+      if (idx == 1) { steps_notesoffset = (old_p->pot[idx]); }
     }
   }
 }
@@ -77,6 +78,7 @@ void getMidiData(){
       case midi::Clock :
       { 
         ticks++;
+//        ticks++; ///doublespeed!!
 
         //Serial.print('.');
 //        Serial.println(ticks);        
@@ -84,12 +86,16 @@ void getMidiData(){
         if(ticks < 6)
         {
           digitalWrite(PIN_LED_TEMPO, LOW);
-          //Serial.print('#');       
+          //Serial.print('#'); 
+  
         }
         else if(ticks == 6)
         {
           digitalWrite(PIN_LED_TEMPO, HIGH);
-          next();
+          if (playing) {
+            next();
+          }
+          
         }
         else if(ticks >= 24)
         {
@@ -102,8 +108,17 @@ void getMidiData(){
       case midi::Start :
       {
         digitalWrite(PIN_LED_PLAYING, LOW);
+        play_position = 15;
         ticks = 0;
+        playing = true;
+//        reset();
+        
+        
 //        Serial.println("Starting");
+        startmode = 1;
+        stopmode = 0;
+        continuemode = 0;
+        
       }
       break;
 
@@ -111,14 +126,22 @@ void getMidiData(){
       {
         digitalWrite(PIN_LED_PLAYING, HIGH);
         prev_ticks = ticks;
+        playing = false;
 //        Serial.println("Stopping");
+        startmode = 0;
+        stopmode = 1;
+        continuemode = 0;
+        
       }
       break;
       case midi::Continue :
       {
 
         digitalWrite(PIN_LED_PLAYING, LOW);
-
+        startmode = 0;
+        stopmode = 0;
+        continuemode = 1;
+        
         // Restore the LED blink counter
         ticks = prev_ticks;
 //        Serial.println("continuing");

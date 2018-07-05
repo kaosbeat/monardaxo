@@ -1,4 +1,4 @@
-#include <Usb.h>  
+#include <Usb.h>
 #include "MonomeController.h"
 #include <MIDI.h>
 
@@ -22,7 +22,7 @@ typedef struct inputStates
 {
   uint8_t button[3];
   uint8_t pot[2];
-}inputStates;
+} inputStates;
 
 inputStates lastdata;
 inputStates newdata;
@@ -30,8 +30,12 @@ inputStates newdata;
 
 static const uint16_t DEBOUNCE_COUNT = 50;
 
+// MIDI_CREATE_DEFAULT_INSTANCE();
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
+//MIDI midi(Serial);
+
+
 USBHost usb;
 MonomeController monome(usb);
 
@@ -46,6 +50,14 @@ byte step[6][16];
 byte notes[16][127]; /// notesplaying 16 channels / 127 notes
 int polygome_channel = 1;
 int notes_channel = 16; //midi channel for notes app
+int steps_channel = 15;
+int steps_notesoffset = 64; /// offset for midinotes in seq
+int steps_speedmultiplier = 0;
+int startmode = 0;
+int stopmode = 1;
+int continuemode = 0;
+boolean playing = true;
+
 
 unsigned long t = millis();
 unsigned long interval = 200;
@@ -54,7 +66,7 @@ int currentMode = 0;  //default 0 = steps, 1 = polygome (needed for draw/update/
 
 // SETUP //////////////////
 
-void setup() 
+void setup()
 {
   // LED outputs for MIDI debug
   pinMode(PIN_LED_PLAYING, OUTPUT);
@@ -64,10 +76,10 @@ void setup()
 #if 1
   MIDI.begin(MIDI_CHANNEL_OMNI);
   MIDI.turnThruOff();
-#endif  
-//  Serial.begin(115200);
-//  Serial.print("\r\ninitialized.\r\n");
-//  delay(200);
+#endif
+//    Serial.begin(115200);
+//    Serial.print("\r\ninitialized.\r\n");
+//    delay(200);
 
   //monomesetup
   monome.SetConnectCallback(&ConnectCallback);
@@ -78,8 +90,8 @@ void setup()
   pinMode(PIN_BTN1, INPUT_PULLUP);
   pinMode(PIN_BTN2, INPUT_PULLUP);
 
-//  pinMode(PIN_LED_GRN, OUTPUT);
-//  pinMode(PIN_LED_RED, OUTPUT);
+  //  pinMode(PIN_LED_GRN, OUTPUT);
+  //  pinMode(PIN_LED_RED, OUTPUT);
   readinputs(&lastdata);
 
 }
@@ -87,7 +99,7 @@ void setup()
 
 // CONNECT //////////////////
 void ConnectCallback(const char * name, byte cols, byte rows) {
-//  Serial.print("\r\nmonome device connected!\r\n\n");
+  //  Serial.print("\r\nmonome device connected!\r\n\n");
 }
 
 // KEY //////////////////
@@ -95,67 +107,74 @@ void ConnectCallback(const char * name, byte cols, byte rows) {
 
 void GridKeyCallback(byte x, byte y, byte z) {
   if (currentMode == 0)
-    stepsKey(x,y,z);
+    stepsKey(x, y, z);
   else if (currentMode == 1)
-    polygomeKey(x,y,z,play_position);
+    polygomeKey(x, y, z, play_position);
   else if (currentMode == 2)
-    notesKey(x,y,z);
+    notesKey(x, y, z);
 }
 
 
 
 
-void loop() 
+void loop()
 {
-getMidiData();   //// all incoming midi processing is done in midishielfunctions
+  getMidiData();   //// all incoming midi processing is done in midishielfunctions
 
   ///monomestuff
   usb.Task();
 
-  
+
   // redraw if dirty
-  if(dirty) {
+  if (dirty) {
     if (currentMode == 0)
       stepsRedraw();
     if (currentMode == 1)
-      polygomeRedraw();  
+      polygomeRedraw();
     if (currentMode == 2)
-      notesRedraw();  
+      notesRedraw();
     monome.refresh();
     dirty = false;
   }
 
 
-  
+
 }
 
 
 
-// NEXT ////////////////// 
+// NEXT //////////////////
 void next() {
   killNotes();
-  if(cutting)
+  if (cutting)
     play_position = next_position;
-  else if(play_position == 15)
+  else if (play_position == 15)
     play_position = 0;
-  else if(play_position == loop_end)
+  else if (play_position == loop_end)
     play_position = loop_start;
-  else 
-      play_position++;
-  
+  else
+    play_position++;
+
   cutting = false;
-    
-  
+
+
   // TRIGGER SOMETHING for STEPS
-  for(byte y=0;y<6;y++)
-    if(step[y][play_position] == 1)
+  for (byte y = 0; y < 6; y++)
+    if (step[y][play_position] == 1)
       stepsTrigger(y);
 
   //TRIGGER for polygome
-    polygomeTrigger();
-  
+  polygomeTrigger();
+
   dirty = true;
 }
-  
+
+void reset() {
+  if (cutting)
+    play_position = next_position;
+  else 
+    play_position == 15;
+}
+
 
 
