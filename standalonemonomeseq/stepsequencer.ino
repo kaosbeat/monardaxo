@@ -30,9 +30,9 @@ void stepsKey(byte x,byte y,byte z){
 void stepsRedraw() {
   monome.led_clear();
   //draw debugstuff
-  if (startmode == 1) { monome.led_set(0,0,15);} else  { monome.led_set(0,0,0);}
-  if (stopmode == 1) { monome.led_set(1,0,15);} else  { monome.led_set(1,0,0);}
-  if (continuemode == 1) { monome.led_set(2,0,15);} else  { monome.led_set(2,0,0);}
+//  if (startmode == 1) { monome.led_set(0,0,15);} else  { monome.led_set(0,0,0);}
+//  if (stopmode == 1) { monome.led_set(1,0,15);} else  { monome.led_set(1,0,0);}
+//  if (continuemode == 1) { monome.led_set(2,0,15);} else  { monome.led_set(2,0,0);}
   // draw toggles with play bar
   byte highlight;
   for(byte x=0;x<16;x++) {
@@ -40,8 +40,8 @@ void stepsRedraw() {
       highlight = 4;
     else
       highlight = 0;
-//    for(byte y=0;y<6;y++)  /// temp shutdown of row 1 for debug
-    for(byte y=1;y<6;y++)
+    for(byte y=0;y<6;y++)  /// temp shutdown of row 1 for debug
+//    for(byte y=1;y<6;y++)
       monome.led_set(x,y,step[y][x] * 11 + highlight);
   }
   
@@ -66,6 +66,13 @@ void stepsTrigger(byte i) {
 
 }
 
+void stepsTriggerChannel(byte i, int channel) {   /////DIRTY HACK WARNING, ABUSING CHANNELS FOR TESTING
+  i = i + steps_notesoffset;
+   MIDI.sendNoteOn(i, 127, channel);
+//   Serial.print(i);
+   notes[steps_channel][i] = 1;  ///set notes playing on channel/note
+
+}
 
 
 

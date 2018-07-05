@@ -159,9 +159,16 @@ void next() {
 
 
   // TRIGGER SOMETHING for STEPS
-  for (byte y = 0; y < 6; y++)
+//  for (byte y = 0; y < 6; y++)
+//    if (step[y][play_position] == 1)
+//      stepsTrigger(y);
+  for (byte y = 0; y < 3; y++)
     if (step[y][play_position] == 1)
-      stepsTrigger(y);
+      stepsTriggerChannel(y, 15);
+
+  for (byte y = 3; y < 6; y++)
+    if (step[y][play_position] == 1)
+      stepsTriggerChannel(y, 14);
 
   //TRIGGER for polygome
   polygomeTrigger();
