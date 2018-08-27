@@ -30,7 +30,6 @@ void polygomeKey(byte x,byte y,byte z, int play_position){
   if(z == 1 && x==0 && y==0) {
     if (freezekeys == false) {
       freezekeys = true;
-      monome.led_set(0,0,15);
       dirty = true; 
     } else {
       freezekeys = false;
@@ -56,6 +55,11 @@ void polygomeKey(byte x,byte y,byte z, int play_position){
 
 void polygomeRedraw() {
   monome.led_clear();
+  if (freezekeys == true) {
+    monome.led_set(0,0,15);
+  } else { 
+    monome.led_set(0,0,0);
+  }
 //  byte x = seq1offset % 16;
 //  byte y = seq1offset - (16 * x) ;
   //from current step draw with overflow currently held keys
