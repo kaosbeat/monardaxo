@@ -29,6 +29,7 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
       old_p->button[idx] = new_p->button[idx];
       if (old_p->button[idx] == true){
         currentMode = idx;
+        MIDI.sendControlChange(idx,old_p->button[idx], 2);
         MIDI.sendNoteOn(idx, 127, 2);
         }
       else if (old_p->button[idx] == false){
@@ -47,7 +48,7 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
 //      Serial.print(idx);
 //      Serial.print(" changed to ");
 //      Serial.println(old_p->pot[idx]);
-//      MIDI.sendControlChange(idx, old_p->pot[idx],2);
+      MIDI.sendControlChange(idx, old_p->pot[idx],2);
       if (idx == 0) { steps_notesoffset = (old_p->pot[idx]); }
       if (idx == 1) { steps_notesoffset = (old_p->pot[idx]); }
     }

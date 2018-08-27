@@ -5,16 +5,19 @@ byte notes_state[16][8];
 
 
 void notesKey(byte x,byte y,byte z){
-    MIDI.sendNoteOn(x, y, notes_channel);
+    midiLed(gridXYtoNoteNumber(x, y),z);
+    dirty = true;
 }
 
 
 void midiLed(byte note,byte velocity) {
   if (velocity > 0) {
     notes_state[noteNumberToGridX(note)][noteNumberToGridY(note)] = 1;
+    MIDI.sendNoteOn(note, 100, notes_channel);
   }
   else {
     notes_state[noteNumberToGridX(note)][noteNumberToGridY(note)] = 0;
+    MIDI.sendNoteOn(note, 0, notes_channel);
   }
 }
 

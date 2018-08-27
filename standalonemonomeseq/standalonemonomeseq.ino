@@ -106,12 +106,15 @@ void ConnectCallback(const char * name, byte cols, byte rows) {
 
 
 void GridKeyCallback(byte x, byte y, byte z) {
-  if (currentMode == 0)
+  if (currentMode == 0){
     stepsKey(x, y, z);
-  else if (currentMode == 1)
+  } else if (currentMode == 1) {
+//    MIDI.sendNoteOn(22, 22, 2); /// works
     polygomeKey(x, y, z, play_position);
-  else if (currentMode == 2)
+  } else if (currentMode == 2) {
+//    MIDI.sendNoteOn(33, 33, 3); /// works
     notesKey(x, y, z);
+  }
 }
 
 
