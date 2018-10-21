@@ -28,9 +28,27 @@ void compareinputs(inputStates * old_p, inputStates * new_p)
     {
       old_p->button[idx] = new_p->button[idx];
       if (old_p->button[idx] == true){
-        currentMode = idx;
-        MIDI.sendControlChange(idx,old_p->button[idx], 2);
-        MIDI.sendNoteOn(idx, 127, 2);
+          if (idx == 0){
+            if (currentMode >= 5) {
+              currentMode = 0;
+            } else {
+            currentMode++;
+            }
+//        currentMode /= idx;
+//        MIDI.sendControlChange(idx,old_p->button[idx], 2);
+          MIDI.sendNoteOn(idx, 127, currentMode);
+        } else if (idx == 1) {
+          MIDI.sendNoteOn(idx, 127, currentMode);
+
+        }else if (idx == 2){
+          if (currentMode <= 0) {
+            currentMode == 5;  
+          } else {
+            currentMode--;
+          }
+          MIDI.sendNoteOn(idx, 127, currentMode);
+
+        }
         }
       else if (old_p->button[idx] == false){
         MIDI.sendNoteOn(idx, 0, 2);
@@ -81,7 +99,7 @@ void getMidiData(){
         ticks++;
 //        ticks++; ///doublespeed!!
 
-        //Serial.print('.');
+//        Serial.print('.');
 //        Serial.println(ticks);        
         
         if(ticks < 6)
@@ -93,15 +111,45 @@ void getMidiData(){
         else if(ticks == 6)
         {
           digitalWrite(PIN_LED_TEMPO, HIGH);
+          //Serial.print("6ticks");
+          if (playing) {
+            next4();
+          }
+        }
+        else if(ticks == 8)
+        {
+          if (playing) {
+            next3();
+          }
+        }
+        else if(ticks == 12)
+        {
+          if (playing) {
+            next2();
+            next4();
+          }
+        }
+        else if(ticks == 16)
+        {          
+          if (playing) {
+            next4();
+          }
+        }
+        else if(ticks == 18)
+        {
+         if (playing) {
+            next3();
+          }
+        }
+        else if(ticks == 24)
+        {   
           if (playing) {
             next();
+            next2();
+            next3();
+            next4();
           }
-          
-        }
-        else if(ticks >= 24)
-        {
-          ticks = 0;
-//          Serial.print('\n');
+          ticks=0;
         }
       }
       break;
@@ -110,6 +158,9 @@ void getMidiData(){
       {
         digitalWrite(PIN_LED_PLAYING, LOW);
         play_position = 15;
+        play_position2 = 15;
+        play_position3 = 15;
+        play_position4 = 15;
         ticks = 0;
         playing = true;
 //        reset();

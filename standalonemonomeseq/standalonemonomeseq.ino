@@ -41,18 +41,34 @@ MonomeController monome(usb);
 
 
 boolean dirty;
-byte play_position;
+byte play_position = 0;
+byte play_position2 = 0;
+byte play_position3 = 0;
+byte play_position4 = 0;
 byte next_position;
+byte next_position2;
+byte next_position3;
+byte next_position4;
 boolean cutting;
 byte keys_held, key_last;
 byte loop_start, loop_end = 15;
+
 byte step[6][16];
+byte step2[7][16];
+byte step3[7][16];
+byte step4[7][16];
+
+int steps_channel = 15;
+int steps_notesoffset = 64; /// offset for midinotes in seq
+int steps2_notesoffset = 72; /// offset for midinotes in seq
+int steps3_notesoffset = 80; /// offset for midinotes in seq
+int steps4_notesoffset = 88; /// offset for midinotes in seq
+int steps_speedmultiplier = 0;
+
 byte notes[16][127]; /// notesplaying 16 channels / 127 notes
 int polygome_channel = 1;
 int notes_channel = 16; //midi channel for notes app
-int steps_channel = 15;
-int steps_notesoffset = 64; /// offset for midinotes in seq
-int steps_speedmultiplier = 0;
+
 int startmode = 0;
 int stopmode = 1;
 int continuemode = 0;
@@ -109,9 +125,15 @@ void GridKeyCallback(byte x, byte y, byte z) {
   if (currentMode == 0){
     stepsKey(x, y, z);
   } else if (currentMode == 1) {
+    steps2Key(x, y, z);
+  } else if (currentMode == 2) {
+    steps3Key(x, y, z);
+  } else if (currentMode == 3){
+    steps4Key(x, y, z);
+  } else if (currentMode == 4) {
 //    MIDI.sendNoteOn(22, 22, 2); /// works
     polygomeKey(x, y, z, play_position);
-  } else if (currentMode == 2) {
+  } else if (currentMode == 5) {
 //    MIDI.sendNoteOn(33, 33, 3); /// works
     notesKey(x, y, z);
   }
@@ -133,8 +155,14 @@ void loop()
     if (currentMode == 0)
       stepsRedraw();
     if (currentMode == 1)
-      polygomeRedraw();
+      steps2Redraw();
     if (currentMode == 2)
+      steps3Redraw();
+    if (currentMode == 3)
+      steps4Redraw();
+    if (currentMode == 4)
+      polygomeRedraw();
+    if (currentMode == 5)
       notesRedraw();
     monome.refresh();
     dirty = false;
@@ -162,16 +190,16 @@ void next() {
 
 
   // TRIGGER SOMETHING for STEPS
-//  for (byte y = 0; y < 6; y++)
+  for (byte y = 0; y < 6; y++)
+    if (step[y][play_position] == 1)
+      stepsTrigger(y);
+//  for (byte y = 0; y < 3; y++)
 //    if (step[y][play_position] == 1)
-//      stepsTrigger(y);
-  for (byte y = 0; y < 3; y++)
-    if (step[y][play_position] == 1)
-      stepsTriggerChannel(y, 15);
-
-  for (byte y = 3; y < 6; y++)
-    if (step[y][play_position] == 1)
-      stepsTriggerChannel(y, 14);
+//      stepsTriggerChannel(y, 15);
+//
+//  for (byte y = 3; y < 6; y++)
+//    if (step[y][play_position] == 1)
+//      stepsTriggerChannel(y, 14);
 
   //TRIGGER for polygome
   polygomeTrigger();
@@ -179,11 +207,47 @@ void next() {
   dirty = true;
 }
 
+void next2(){
+    if (play_position2 == 15)
+    play_position2 = 0;
+    else
+    play_position2++;
+     for (byte y = 0; y < 7; y++)
+    if (step2[y][play_position] == 1)
+      steps2Trigger(y);
+    dirty = true;
+  }
+
+void next3(){
+    if (play_position3 == 15)
+    play_position3 = 0;
+    else
+    play_position3++;
+    for (byte y = 0; y < 7; y++)
+    if (step3[y][play_position] == 1)
+      steps3Trigger(y);
+    dirty = true;
+  }
+
+void next4(){
+    if (play_position4 == 15)
+    play_position4 = 0;
+    else
+    play_position4++;
+    for (byte y = 0; y < 7; y++)
+    if (step4[y][play_position] == 1)
+      steps4Trigger(y);
+    dirty = true;
+  }
+  
 void reset() {
   if (cutting)
     play_position = next_position;
   else 
     play_position == 15;
+    play_position2 == 15;
+    play_position3 == 15;
+    play_position4 == 15;
 }
 
 

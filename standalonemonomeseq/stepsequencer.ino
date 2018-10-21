@@ -1,4 +1,4 @@
-
+////define multiplke stepsequencers her, for multiple dividers
 
 void stepsKey(byte x,byte y,byte z){  
   // toggle steps
@@ -24,8 +24,27 @@ void stepsKey(byte x,byte y,byte z){
   }
  }
 
- 
-
+void steps2Key(byte x,byte y,byte z){  
+  // toggle steps
+  if(z == 1 && y < 7) {
+    step2[y][x] ^= 1;
+    dirty = true; 
+  }
+ }
+void steps3Key(byte x,byte y,byte z){  
+  // toggle steps
+  if(z == 1 && y < 7) {
+    step3[y][x] ^= 1;
+    dirty = true; 
+  }
+ }
+void steps4Key(byte x,byte y,byte z){  
+  // toggle steps
+  if(z == 1 && y < 7) {
+    step4[y][x] ^= 1;
+    dirty = true; 
+  }
+ }
 // REDRAW ////////////////// 
 void stepsRedraw() {
   monome.led_clear();
@@ -57,6 +76,54 @@ void stepsRedraw() {
 }
 
 
+void steps2Redraw() {
+  monome.led_clear();
+  byte highlight;
+  for(byte x=0;x<16;x++) {
+    if(x == play_position2)
+      highlight = 4;
+    else
+      highlight = 0;
+    for(byte y=0;y<7;y++)
+      monome.led_set(x,y,step2[y][x] * 11 + highlight);
+  }
+  // draw playback position
+  monome.led_set(play_position2,7,15);
+}
+
+void steps3Redraw() {
+  monome.led_clear();
+  byte highlight;
+  for(byte x=0;x<16;x++) {
+    if(x == play_position3)
+      highlight = 4;
+    else
+      highlight = 0;
+    for(byte y=0;y<7;y++)
+      monome.led_set(x,y,step3[y][x] * 11 + highlight);
+  }
+  // draw playback position
+  monome.led_set(play_position3,7,15);
+}
+
+void steps4Redraw() {
+  monome.led_clear();
+  byte highlight;
+  for(byte x=0;x<16;x++) {
+    if(x == play_position4)
+      highlight = 4;
+    else
+      highlight = 0;
+    for(byte y=0;y<6;y++)
+      monome.led_set(x,y,step4[y][x] * 11 + highlight);
+  }
+  // draw playback position
+  monome.led_set(play_position4,7,15);
+}
+
+
+
+
 // TRIGGER ////////////////// 
 void stepsTrigger(byte i) {
   i = i + steps_notesoffset;
@@ -65,6 +132,27 @@ void stepsTrigger(byte i) {
    notes[steps_channel][i] = 1;  ///set notes playing on channel/note
 
 }
+
+void steps2Trigger(byte i) {
+  i = i + steps2_notesoffset;
+   MIDI.sendNoteOn(i, 127, steps_channel);
+   notes[steps_channel][i] = 1;  ///set notes playing on channel/note
+
+}
+
+void steps3Trigger(byte i) {
+  i = i + steps3_notesoffset;
+   MIDI.sendNoteOn(i, 127, steps_channel);
+   notes[steps_channel][i] = 1;  ///set notes playing on channel/note
+
+}
+void steps4Trigger(byte i) {
+  i = i + steps4_notesoffset;
+   MIDI.sendNoteOn(i, 127, steps_channel);
+   notes[steps_channel][i] = 1;  ///set notes playing on channel/note
+}
+
+
 
 void stepsTriggerChannel(byte i, int channel) {   /////DIRTY HACK WARNING, ABUSING CHANNELS FOR TESTING
   i = i + steps_notesoffset;
