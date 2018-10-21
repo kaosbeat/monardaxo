@@ -30,13 +30,10 @@ void polygomeKey(byte x,byte y,byte z, int play_position){
   if(z == 1 && x==0 && y==0) {
     if (freezekeys == false) {
       freezekeys = true;
-      dirty = true; 
     } else {
       freezekeys = false;
-      monome.led_set(0,0,0);
-      dirty = true; 
     }
-    
+    dirty = true; 
   }
   if (freezekeys == false) { ////start updating shizzle
     if(z == 1 && y > 0) {
