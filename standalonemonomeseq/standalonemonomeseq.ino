@@ -93,9 +93,9 @@ void setup()
   MIDI.begin(MIDI_CHANNEL_OMNI);
   MIDI.turnThruOff();
 #endif
-//    Serial.begin(115200);
-//    Serial.print("\r\ninitialized.\r\n");
-//    delay(200);
+  //    Serial.begin(115200);
+  //    Serial.print("\r\ninitialized.\r\n");
+  //    delay(200);
 
   //monomesetup
   monome.SetConnectCallback(&ConnectCallback);
@@ -122,19 +122,20 @@ void ConnectCallback(const char * name, byte cols, byte rows) {
 
 
 void GridKeyCallback(byte x, byte y, byte z) {
-  if (currentMode == 0){
+   MIDI.sendNoteOn(22, 22, 2);
+  if (currentMode == 0) {
     stepsKey(x, y, z);
   } else if (currentMode == 1) {
     steps2Key(x, y, z);
   } else if (currentMode == 2) {
     steps3Key(x, y, z);
-  } else if (currentMode == 3){
+  } else if (currentMode == 3) {
     steps4Key(x, y, z);
   } else if (currentMode == 4) {
-//    MIDI.sendNoteOn(22, 22, 2); /// works
+    //    MIDI.sendNoteOn(22, 22, 2); /// works
     polygomeKey(x, y, z, play_position);
   } else if (currentMode == 5) {
-//    MIDI.sendNoteOn(33, 33, 3); /// works
+    //    MIDI.sendNoteOn(33, 33, 3); /// works
     notesKey(x, y, z);
   }
 }
@@ -179,7 +180,7 @@ void next() {
   killNotes();
   if (cutting)
     play_position = next_position;
-  else if (play_position == 15)
+  else if (play_position == 16)
     play_position = 0;
   else if (play_position == loop_end)
     play_position = loop_start;
@@ -193,13 +194,13 @@ void next() {
   for (byte y = 0; y < 6; y++)
     if (step[y][play_position] == 1)
       stepsTrigger(y);
-//  for (byte y = 0; y < 3; y++)
-//    if (step[y][play_position] == 1)
-//      stepsTriggerChannel(y, 15);
-//
-//  for (byte y = 3; y < 6; y++)
-//    if (step[y][play_position] == 1)
-//      stepsTriggerChannel(y, 14);
+  //  for (byte y = 0; y < 3; y++)
+  //    if (step[y][play_position] == 1)
+  //      stepsTriggerChannel(y, 15);
+  //
+  //  for (byte y = 3; y < 6; y++)
+  //    if (step[y][play_position] == 1)
+  //      stepsTriggerChannel(y, 14);
 
   //TRIGGER for polygome
   polygomeTrigger();
@@ -207,48 +208,45 @@ void next() {
   dirty = true;
 }
 
-void next2(){
-    if (play_position2 == 15)
+void next2() {
+  if (play_position2 == 16)
     play_position2 = 0;
-    else
+  else
     play_position2++;
-     for (byte y = 0; y < 7; y++)
+  for (byte y = 0; y < 7; y++)
     if (step2[y][play_position] == 1)
       steps2Trigger(y);
-    dirty = true;
-  }
+  dirty = true;
+}
 
-void next3(){
-    if (play_position3 == 15)
+void next3() {
+  if (play_position3 == 16)
     play_position3 = 0;
-    else
+  else
     play_position3++;
-    for (byte y = 0; y < 7; y++)
+  for (byte y = 0; y < 7; y++)
     if (step3[y][play_position] == 1)
       steps3Trigger(y);
-    dirty = true;
-  }
+  dirty = true;
+}
 
-void next4(){
-    if (play_position4 == 15)
+void next4() {
+  if (play_position4 == 16)
     play_position4 = 0;
-    else
+  else
     play_position4++;
-    for (byte y = 0; y < 7; y++)
+  for (byte y = 0; y < 7; y++)
     if (step4[y][play_position] == 1)
       steps4Trigger(y);
-    dirty = true;
-  }
-  
+  dirty = true;
+}
+
 void reset() {
   if (cutting)
     play_position = next_position;
-  else 
-    play_position == 15;
-    play_position2 == 15;
-    play_position3 == 15;
-    play_position4 == 15;
+  else
+    play_position == 0;
+  play_position2 == 0;
+  play_position3 == 0;
+  play_position4 == 0;
 }
-
-
-

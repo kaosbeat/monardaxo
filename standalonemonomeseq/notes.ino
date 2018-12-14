@@ -17,7 +17,8 @@ void midiLed(byte note,byte velocity) {
   }
   else {
     notes_state[noteNumberToGridX(note)][noteNumberToGridY(note)] = 0;
-    MIDI.sendNoteOn(note, 0, notes_channel);
+//    MIDI.sendNoteOn(note, 0, notes_channel);
+    MIDI.sendNoteOff(note, 100, notes_channel);
   }
 }
 
@@ -31,4 +32,3 @@ void notesRedraw() {
       }
    }
 }
-

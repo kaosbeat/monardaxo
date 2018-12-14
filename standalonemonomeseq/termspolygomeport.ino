@@ -15,7 +15,7 @@ byte heldkeys[16][8];
 ///when keydown get seq1
 //log startstep / seq1play = true
 //play note seq[step - startstep]
-//on next()
+//on next4()
 //play note seq[step - startstep]
 //[...]
 //if keyup
@@ -133,4 +133,3 @@ byte noteNumberToGridY(byte note) {
   byte y = (note - x) / 16 ;
   return y;
 }
-

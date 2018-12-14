@@ -87,7 +87,7 @@ void getMidiData(){
   readinputs(& newdata);
   compareinputs(& lastdata, & newdata);
 //  updateLEDs(&newdata);
-  static uint32_t loops = 0;  
+//  static uint32_t loops = 0;  
   static uint8_t  ticks = 0;
   static uint8_t  prev_ticks = 0;
   if(  MIDI.read())
@@ -97,59 +97,31 @@ void getMidiData(){
       case midi::Clock :
       { 
         ticks++;
-//        ticks++; ///doublespeed!!
-
-//        Serial.print('.');
-//        Serial.println(ticks);        
-        
-        if(ticks < 6)
-        {
-          digitalWrite(PIN_LED_TEMPO, LOW);
-          //Serial.print('#'); 
-  
-        }
-        else if(ticks == 6)
+        if(ticks == 6)
         {
           digitalWrite(PIN_LED_TEMPO, HIGH);
-          //Serial.print("6ticks");
           if (playing) {
             next4();
           }
         }
-        else if(ticks == 8)
+         else if(ticks == 8)
         {
           if (playing) {
             next3();
           }
         }
-        else if(ticks == 12)
-        {
+        else if(ticks  == 12) {
           if (playing) {
             next2();
-            next4();
-          }
-        }
-        else if(ticks == 16)
-        {          
-          if (playing) {
-            next4();
-          }
-        }
-        else if(ticks == 18)
-        {
-         if (playing) {
-            next3();
           }
         }
         else if(ticks == 24)
+        digitalWrite(PIN_LED_TEMPO, LOW);
         {   
           if (playing) {
             next();
-            next2();
-            next3();
-            next4();
           }
-          ticks=0;
+        ticks=0;
         }
       }
       break;
@@ -157,16 +129,13 @@ void getMidiData(){
       case midi::Start :
       {
         digitalWrite(PIN_LED_PLAYING, LOW);
-        play_position = 15;
-        play_position2 = 15;
-        play_position3 = 15;
-        play_position4 = 15;
+        play_position = 0;
+        play_position2 = 0;
+        play_position3 = 0;
+        play_position4 = 0;
         ticks = 0;
+        reset();
         playing = true;
-//        reset();
-        
-        
-//        Serial.println("Starting");
         startmode = 1;
         stopmode = 0;
         continuemode = 0;
@@ -221,6 +190,5 @@ void getMidiData(){
     }
   }
 
-  loops++;
+//  loops++;
 }
-
